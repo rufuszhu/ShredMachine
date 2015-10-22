@@ -19,7 +19,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.rufus.shredmachine.R;
 import com.rufus.shredmachine.activity.MainActivity;
 import com.rufus.shredmachine.bean.GPSData;
@@ -39,7 +38,6 @@ public class TrackingService extends Service implements
     protected Notification playNotification;
 
     protected Location mCurrentLocation;
-
     private TrackResult trackResult;
 
     /**
@@ -112,7 +110,7 @@ public class TrackingService extends Service implements
         trackResult.save();
 
         GlobalApplication.getDefaultSharePreferences().edit().putLong(Constants.SHARE_PREFERENCE.ACTIVE_TRACK_ID, trackResult.id).apply();
-        Timber.i("trackResult id: " + trackResult.id);
+        Timber.i("trackResult id: %d", trackResult.id);
     }
 
     @Override
@@ -221,14 +219,9 @@ public class TrackingService extends Service implements
         //notify the UI to draw line on map
         EventBus.getDefault().post(new LocationUpdateEvent(location));
         //store it into db
-        GPSData gpsData = new GPSData();
-        gpsData.latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        gpsData.speed = location.getSpeed();
-        gpsData.timeStamp = TimeUtil.getTimeStamp();
+        GPSData gpsData = new GPSData(location);
         gpsData.associateTrackResult(trackResult);
         gpsData.save();
-//        trackResult.getGPSDatas().add(gpsData);
-//        trackResult.save();
     }
 
     @Override
@@ -243,7 +236,7 @@ public class TrackingService extends Service implements
     public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
         // onConnectionFailed.
-        Timber.i("Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+        Timber.i("Connection failed: ConnectionResult.getErrorCode() = %s", result.getErrorCode());
     }
 
     /**

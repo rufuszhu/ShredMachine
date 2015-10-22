@@ -120,7 +120,7 @@ public class TrackingActivity extends AppCompatActivity implements OnMapReadyCal
             if (activeTrackID != -1) {
                 TrackResult trackResult = new Select().from(TrackResult.class).where(Condition.column(TrackResult$Table.ID).is(activeTrackID)).querySingle();
                 if (trackResult != null) {
-                    ArrayList<LatLng> list = buildLatLngList(trackResult.getGPSDatas());
+                    ArrayList<LatLng> list = buildLatLngList(trackResult.getGPSDataList());
                     line.setPoints(list);
                 } else {
                     Timber.e("Active track result not found in database, id: " + activeTrackID);

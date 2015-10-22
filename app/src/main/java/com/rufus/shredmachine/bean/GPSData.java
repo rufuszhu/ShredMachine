@@ -1,5 +1,7 @@
 package com.rufus.shredmachine.bean;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
@@ -16,13 +18,17 @@ public class GPSData extends BaseModel {
     long id;
 
     @Column
-    public double speed;
-
+    public long timeStamp;
     @Column
     public LatLng latLng;
-
     @Column
-    public long timeStamp;
+    public double altitude;
+    @Column
+    public double speed;
+    @Column
+    public double bearing;
+    @Column
+    public double accuracy;
 
     @Column
     @ForeignKey(
@@ -31,6 +37,20 @@ public class GPSData extends BaseModel {
                     foreignColumnName = "id")},
             saveForeignKeyModel = false)
     ForeignKeyContainer<TrackResult> trackResultModelContainer;
+
+    public GPSData() {
+        super();
+    }
+
+    public GPSData(Location location) {
+        super();
+        timeStamp = location.getTime();
+        latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        altitude = location.getAltitude();
+        speed = location.getSpeed();
+        bearing = location.getBearing();
+        accuracy = location.getAccuracy();
+    }
 
 
     public void associateTrackResult(TrackResult trackResult) {

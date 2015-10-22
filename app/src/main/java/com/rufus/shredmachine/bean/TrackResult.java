@@ -28,16 +28,16 @@ public class TrackResult extends BaseModel {
     public long stopTime;
 
     // needs to be accessible for DELETE
-    List<GPSData> gpsDatas;
+    List<GPSData> gpsDataList;
 
-    @OneToMany(methods = {OneToMany.Method.SAVE, OneToMany.Method.DELETE}, variableName = "gpsDatas")
-    public List<GPSData> getGPSDatas() {
-        if (gpsDatas == null) {
-            gpsDatas = new Select()
+    @OneToMany(methods = {OneToMany.Method.SAVE, OneToMany.Method.DELETE}, variableName = "gpsDataList")
+    public List<GPSData> getGPSDataList() {
+        if (gpsDataList == null) {
+            gpsDataList = new Select()
                     .from(GPSData.class)
                     .where(Condition.column(GPSData$Table.TRACKRESULTMODELCONTAINER_TRACKRESULT_ID).is(id))
                     .queryList();
         }
-        return gpsDatas;
+        return gpsDataList;
     }
 }

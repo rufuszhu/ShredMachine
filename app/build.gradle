@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId "com.rufus.shredmachine"
         minSdkVersion 21
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         // Enabling multidex support.
