@@ -33,7 +33,8 @@ import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
-public class TrackingActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class TrackingActivity extends AppCompatActivity
+        implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Polyline line;
@@ -41,14 +42,14 @@ public class TrackingActivity extends AppCompatActivity implements OnMapReadyCal
     @OnClick(R.id.start)
     void startService() {
         Intent startIntent = new Intent(TrackingActivity.this, TrackingService.class);
-        startIntent.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
+        startIntent.setAction(Constants.ACTION.START_FOREGROUND_ACTION);
         startService(startIntent);
     }
 
     @OnClick(R.id.stop)
     void stopService() {
         Intent stopIntent = new Intent(TrackingActivity.this, TrackingService.class);
-        stopIntent.setAction(Constants.ACTION.STOPFOREGROUND_ACTION);
+        stopIntent.setAction(Constants.ACTION.STOP_FOREGROUND_ACTION);
         startService(stopIntent);
     }
 
