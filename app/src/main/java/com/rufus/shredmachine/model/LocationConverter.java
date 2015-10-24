@@ -1,4 +1,4 @@
-package com.rufus.shredmachine.bean;
+package com.rufus.shredmachine.model;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.raizlabs.android.dbflow.converter.TypeConverter;

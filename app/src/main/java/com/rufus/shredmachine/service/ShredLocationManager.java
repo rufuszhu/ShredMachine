@@ -8,10 +8,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.rufus.shredmachine.bean.GPSData;
-import com.rufus.shredmachine.bean.TrackResult;
+import com.rufus.shredmachine.model.GPSData;
+import com.rufus.shredmachine.model.TrackResult;
 import com.rufus.shredmachine.utils.Constants;
-import com.rufus.shredmachine.utils.GlobalApplication;
+import com.rufus.shredmachine.ShredMachineApplication;
 import com.rufus.shredmachine.utils.TimeUtil;
 
 import de.greenrobot.event.EventBus;
@@ -33,9 +33,25 @@ public class ShredLocationManager implements
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
 
-    public ShredLocationManager(TrackingService trackingService) {
+    private static ShredLocationManager mInstance = null;
+
+    private ShredLocationManager(TrackingService trackingService) {
         mTrackingService = trackingService;
         buildGoogleApiClient();
+        trackResult = new TrackResult();
+        trackResult.startTime = TimeUtil.getTimeStamp();
+        trackResult.save();
+        ShredMachineApplication.getDefaultSharePreferences().edit().putLong(Constants.SHARE_PREFERENCE.ACTIVE_TRACK_ID, trackResult.id).apply();
+        Timber.i("trackResult id: %d", trackResult.id);
+    }
+
+    //Singleton
+    public static ShredLocationManager getInstance(TrackingService trackingService){
+        if(mInstance == null)
+        {
+            mInstance = new ShredLocationManager(trackingService);
+        }
+        return mInstance;
     }
 
     public synchronized void buildGoogleApiClient() {
@@ -47,6 +63,14 @@ public class ShredLocationManager implements
                 .build();
 
         createLocationRequest();
+    }
+
+    public void disconnectGoogleApiClient(){
+        mGoogleApiClient.disconnect();
+    }
+
+    public void connectGoogleApiClient(){
+        mGoogleApiClient.connect();
     }
 
     protected void createLocationRequest() {
@@ -70,11 +94,19 @@ public class ShredLocationManager implements
     }
 
     protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
+    protected void destroyLocationService() {
         if (mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            Timber.i("destroying LocationService");
+            stopLocationUpdates();
             mGoogleApiClient.disconnect();
-            mGoogleApiClient = null;
         }
+        if(mGoogleApiClient!=null)
+            mGoogleApiClient=null;
+        Timber.i("destroying LocationManager");
+        mInstance = null;
     }
 
     /**
@@ -84,13 +116,6 @@ public class ShredLocationManager implements
     public void onConnected(Bundle bundle) {
         Timber.i("Connected to GoogleApiClient");
         startLocationUpdates();
-
-        trackResult = new TrackResult();
-        trackResult.startTime = TimeUtil.getTimeStamp();
-        trackResult.save();
-
-        GlobalApplication.getDefaultSharePreferences().edit().putLong(Constants.SHARE_PREFERENCE.ACTIVE_TRACK_ID, trackResult.id).apply();
-        Timber.i("trackResult id: %d", trackResult.id);
     }
 
     @Override
@@ -108,7 +133,7 @@ public class ShredLocationManager implements
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
         //notify the UI to draw line on map
-        EventBus.getDefault().post(new LocationUpdateEvent(location));
+        ShredMachineApplication.getDefaultEvent().post(new LocationUpdateEvent(location));
         //store it into db
         GPSData gpsData = new GPSData(location);
         gpsData.associateTrackResult(trackResult);

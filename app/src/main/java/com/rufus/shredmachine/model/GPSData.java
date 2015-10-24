@@ -1,4 +1,4 @@
-package com.rufus.shredmachine.bean;
+package com.rufus.shredmachine.model;
 
 import android.location.Location;
 

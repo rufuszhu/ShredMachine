@@ -1,7 +1,9 @@
 package com.rufus.shredmachine.utils;
 
+import com.rufus.shredmachine.ShredMachineApplication;
+
 public class Constants {
-    private static String PACKAGE_NAME = GlobalApplication.getInstance().getPackageName();
+    private static String PACKAGE_NAME = ShredMachineApplication.getInstance().getPackageName();
 
     public interface ACTION {
         String MAIN_ACTION = PACKAGE_NAME + ".action.main";

@@ -1,4 +1,4 @@
-package com.rufus.shredmachine.utils;
+package com.rufus.shredmachine;
 
 import android.app.Application;
 import android.content.Context;
@@ -6,15 +6,16 @@ import android.content.SharedPreferences;
 
 import com.facebook.stetho.Stetho;
 import com.raizlabs.android.dbflow.config.FlowManager;
-import com.rufus.shredmachine.BuildConfig;
 import com.squareup.leakcanary.LeakCanary;
 
+import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
-public class GlobalApplication extends Application {
-    private static GlobalApplication mInstance;
+public class ShredMachineApplication extends Application {
+    private static ShredMachineApplication mInstance;
+    private static EventBus eventBus;
 
-    public static GlobalApplication getInstance() {
+    public static ShredMachineApplication getInstance() {
         return mInstance;
     }
 
@@ -30,11 +31,18 @@ public class GlobalApplication extends Application {
         return mInstance.getPackageName();
     }
 
+    public static EventBus getDefaultEvent(){
+        if(eventBus==null)
+            eventBus = EventBus.builder().sendNoSubscriberEvent(false).build();
+
+        return eventBus;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-        LeakCanary.install(this);
+
         //init database
         FlowManager.init(this);
 
@@ -49,6 +57,8 @@ public class GlobalApplication extends Application {
 
             //open debug console in chrome by typing chrome://inspect in the url address
             Stetho.initializeWithDefaults(this);
+
+            LeakCanary.install(this);
 //        } else {
             // TODO Crashlytics.start(this);
             // TODO Timber.plant(new CrashlyticsTree());

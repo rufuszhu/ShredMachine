@@ -1,4 +1,4 @@
-package com.rufus.shredmachine.bean;
+package com.rufus.shredmachine.model;
 
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ModelContainer;

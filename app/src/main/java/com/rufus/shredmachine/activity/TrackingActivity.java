@@ -1,5 +1,7 @@
 package com.rufus.shredmachine.activity;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,13 +19,13 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.rufus.shredmachine.R;
-import com.rufus.shredmachine.bean.GPSData;
-import com.rufus.shredmachine.bean.TrackResult;
-import com.rufus.shredmachine.bean.TrackResult$Table;
+import com.rufus.shredmachine.model.GPSData;
+import com.rufus.shredmachine.model.TrackResult;
+import com.rufus.shredmachine.model.TrackResult$Table;
 import com.rufus.shredmachine.service.LocationUpdateEvent;
 import com.rufus.shredmachine.service.TrackingService;
 import com.rufus.shredmachine.utils.Constants;
-import com.rufus.shredmachine.utils.GlobalApplication;
+import com.rufus.shredmachine.ShredMachineApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +50,11 @@ public class TrackingActivity extends AppCompatActivity
 
     @OnClick(R.id.stop)
     void stopService() {
-        Intent stopIntent = new Intent(TrackingActivity.this, TrackingService.class);
-        stopIntent.setAction(Constants.ACTION.STOP_FOREGROUND_ACTION);
-        startService(stopIntent);
+        if(isTrackingServiceRunning()) {
+            Intent stopIntent = new Intent(TrackingActivity.this, TrackingService.class);
+            stopIntent.setAction(Constants.ACTION.STOP_FOREGROUND_ACTION);
+            startService(stopIntent);
+        }
     }
 
     @Override
@@ -68,18 +72,19 @@ public class TrackingActivity extends AppCompatActivity
     public void onResume() {
         Timber.i("onResume");
         drawLineOnMap();
+        Timber.d("Is tracking service running? " + isTrackingServiceRunning());
         super.onResume();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        ShredMachineApplication.getDefaultEvent().register(this);
     }
 
     @Override
     public void onStop() {
-        EventBus.getDefault().unregister(this);
+        ShredMachineApplication.getDefaultEvent().unregister(this);
         super.onStop();
     }
 
@@ -117,7 +122,7 @@ public class TrackingActivity extends AppCompatActivity
             if (line == null)
                 addEmptyLine();
 
-            long activeTrackID = GlobalApplication.getDefaultSharePreferences().getLong(Constants.SHARE_PREFERENCE.ACTIVE_TRACK_ID, -1);
+            long activeTrackID = ShredMachineApplication.getDefaultSharePreferences().getLong(Constants.SHARE_PREFERENCE.ACTIVE_TRACK_ID, -1);
             if (activeTrackID != -1) {
                 TrackResult trackResult = new Select().from(TrackResult.class).where(Condition.column(TrackResult$Table.ID).is(activeTrackID)).querySingle();
                 if (trackResult != null) {
@@ -143,6 +148,17 @@ public class TrackingActivity extends AppCompatActivity
             result.add(gpsData.latLng);
         }
         return result;
+    }
+
+    private boolean isTrackingServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+//            Timber.d("Running service: " + service.service.getClassName());
+            if (TrackingService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
