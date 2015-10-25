@@ -14,11 +14,10 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 
 import com.rufus.shredmachine.R;
+import com.rufus.shredmachine.ShredMachineApplication;
 import com.rufus.shredmachine.activity.TrackingActivity;
 import com.rufus.shredmachine.utils.Constants;
-import com.rufus.shredmachine.ShredMachineApplication;
 import com.rufus.shredmachine.utils.TimeUtil;
-
 
 import timber.log.Timber;
 
@@ -52,7 +51,7 @@ public class TrackingService extends Service {
         stackBuilder.addParentStack(TrackingActivity.class);
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(trackingIntent);
-        PendingIntent trackingPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent trackingPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         //notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 

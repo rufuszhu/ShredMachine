@@ -19,20 +19,19 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.rufus.shredmachine.R;
+import com.rufus.shredmachine.ShredMachineApplication;
 import com.rufus.shredmachine.model.GPSData;
 import com.rufus.shredmachine.model.TrackResult;
 import com.rufus.shredmachine.model.TrackResult$Table;
 import com.rufus.shredmachine.service.LocationUpdateEvent;
 import com.rufus.shredmachine.service.TrackingService;
 import com.rufus.shredmachine.utils.Constants;
-import com.rufus.shredmachine.ShredMachineApplication;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 public class TrackingActivity extends AppCompatActivity
@@ -50,7 +49,7 @@ public class TrackingActivity extends AppCompatActivity
 
     @OnClick(R.id.stop)
     void stopService() {
-        if(isTrackingServiceRunning()) {
+        if (isTrackingServiceRunning()) {
             Intent stopIntent = new Intent(TrackingActivity.this, TrackingService.class);
             stopIntent.setAction(Constants.ACTION.STOP_FOREGROUND_ACTION);
             startService(stopIntent);

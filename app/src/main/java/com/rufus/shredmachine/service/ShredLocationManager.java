@@ -8,13 +8,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.rufus.shredmachine.ShredMachineApplication;
 import com.rufus.shredmachine.model.GPSData;
 import com.rufus.shredmachine.model.TrackResult;
 import com.rufus.shredmachine.utils.Constants;
-import com.rufus.shredmachine.ShredMachineApplication;
 import com.rufus.shredmachine.utils.TimeUtil;
 
-import de.greenrobot.event.EventBus;
 import timber.log.Timber;
 
 public class ShredLocationManager implements
@@ -46,9 +45,8 @@ public class ShredLocationManager implements
     }
 
     //Singleton
-    public static ShredLocationManager getInstance(TrackingService trackingService){
-        if(mInstance == null)
-        {
+    public static ShredLocationManager getInstance(TrackingService trackingService) {
+        if (mInstance == null) {
             mInstance = new ShredLocationManager(trackingService);
         }
         return mInstance;
@@ -65,11 +63,11 @@ public class ShredLocationManager implements
         createLocationRequest();
     }
 
-    public void disconnectGoogleApiClient(){
+    public void disconnectGoogleApiClient() {
         mGoogleApiClient.disconnect();
     }
 
-    public void connectGoogleApiClient(){
+    public void connectGoogleApiClient() {
         mGoogleApiClient.connect();
     }
 
@@ -103,8 +101,8 @@ public class ShredLocationManager implements
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
         }
-        if(mGoogleApiClient!=null)
-            mGoogleApiClient=null;
+        if (mGoogleApiClient != null)
+            mGoogleApiClient = null;
         Timber.i("destroying LocationManager");
         mInstance = null;
     }
