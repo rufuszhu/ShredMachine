@@ -2,16 +2,24 @@ package com.rufus.shredmachine.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.rufus.shredmachine.R;
+import com.rufus.shredmachine.utils.TransitionHelper;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -20,19 +28,27 @@ import timber.log.Timber;
 public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab)
-    void startTrackingActivity() {
+    void startTrackingActivity(FloatingActionButton view) {
+        final Pair<View, String>[] pairs = TransitionHelper.createSafeTransitionParticipants(this, false, new Pair<>(view, getString(R.string.transition_reveal1)));
+        ActivityOptionsCompat transitionActivityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(this, pairs);
         Intent intent = new Intent(MainActivity.this, TrackingActivity.class);
-        startActivity(intent);
+        startActivity(intent, transitionActivityOptions.toBundle());
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setupWindowAnimations();
+
         ButterKnife.bind(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
+
+    private void setupWindowAnimations() {
 
     }
 
@@ -74,30 +90,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-//
-//        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawerLayout.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
 }
 
 

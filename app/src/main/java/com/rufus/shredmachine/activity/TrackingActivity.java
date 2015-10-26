@@ -1,15 +1,27 @@
 package com.rufus.shredmachine.activity;
 
+import android.animation.Animator;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -61,6 +73,13 @@ public class TrackingActivity extends AppCompatActivity
     @Bind(R.id.nav_view)
     NavigationView navigationView;
 
+    @Bind(R.id.ll_control_bar)
+    LinearLayout llControlBar;
+
+    @Bind(R.id.fab)
+    FloatingActionButton fab;
+
+
     @OnClick(R.id.start)
     void startService() {
         Intent startIntent = new Intent(TrackingActivity.this, TrackingService.class);
@@ -83,6 +102,8 @@ public class TrackingActivity extends AppCompatActivity
         setContentView(R.layout.activity_tracking);
         ButterKnife.bind(this);
 
+        setupWindowAnimations();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -95,21 +116,56 @@ public class TrackingActivity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        initActivityRecognition();
 
-        LinearLayout headerRoot = (LinearLayout) getLayoutInflater().inflate(R.layout.nav_header_debug, navigationView, false);
-        mDetectedActivitiesListView = (ListView) headerRoot.findViewById(R.id.detected_activities_listview);
+    }
 
-        navigationView.addHeaderView(headerRoot);
 
-        mDetectedActivities = new ArrayList<>();
+    private void setupWindowAnimations() {
+        setupEnterAnimations();
+    }
 
-        // Set the confidence level of each monitored activity to zero.
-        for (int i = 0; i < Constants.MONITORED_ACTIVITIES.length; i++) {
-            mDetectedActivities.add(new DetectedActivity(Constants.MONITORED_ACTIVITIES[i], 0));
-        }
+    private void setupEnterAnimations() {
+        Transition transition = TransitionInflater.from(this).inflateTransition(R.transition.slide_and_changebounds);
+        getWindow().setSharedElementEnterTransition(transition);
+        transition.addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
 
-        mAdapter = new DetectedActivitiesAdapter(this, mDetectedActivities);
-        mDetectedActivitiesListView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                // Removing listener here is very important because shared element transition is executed again backwards on exit. If we don't remove the listener this code will be triggered again.
+                transition.removeListener(this);
+                animateRevealShow(llControlBar);
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) {
+            }
+
+            @Override
+            public void onTransitionPause(Transition transition) {
+            }
+
+            @Override
+            public void onTransitionResume(Transition transition) {
+            }
+        });
+    }
+
+    private void animateRevealShow(View viewRoot) {
+        int cx = (fab.getLeft() + fab.getRight()) / 2;
+        int cy = (fab.getTop() + fab.getBottom()) / 2;
+        fab.setVisibility(View.GONE);
+        int finalRadius = Math.max(viewRoot.getWidth(), viewRoot.getHeight());
+
+        Animator anim = ViewAnimationUtils.createCircularReveal(viewRoot, cx, cy, 0, finalRadius);
+        viewRoot.setVisibility(View.VISIBLE);
+        anim.setDuration(1000);
+        anim.setInterpolator(new AccelerateInterpolator());
+        anim.start();
     }
 
 
@@ -209,6 +265,23 @@ public class TrackingActivity extends AppCompatActivity
             }
         }
         return false;
+    }
+
+    private void initActivityRecognition() {
+        LinearLayout headerRoot = (LinearLayout) getLayoutInflater().inflate(R.layout.nav_header_debug, navigationView, false);
+        mDetectedActivitiesListView = (ListView) headerRoot.findViewById(R.id.detected_activities_listview);
+
+        navigationView.addHeaderView(headerRoot);
+
+        mDetectedActivities = new ArrayList<>();
+
+        // Set the confidence level of each monitored activity to zero.
+        for (int i = 0; i < Constants.MONITORED_ACTIVITIES.length; i++) {
+            mDetectedActivities.add(new DetectedActivity(Constants.MONITORED_ACTIVITIES[i], 0));
+        }
+
+        mAdapter = new DetectedActivitiesAdapter(this, mDetectedActivities);
+        mDetectedActivitiesListView.setAdapter(mAdapter);
     }
 }
 

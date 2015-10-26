@@ -7,6 +7,8 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_tracking">Tracking</string>
 
+    <string name="transition_reveal1">transition_reveal1</string>
+
     <!-- Activity detection strings -->
     <string name="in_vehicle">In a vehicle</string>
     <string name="on_bicycle">On a bicycle</string>
