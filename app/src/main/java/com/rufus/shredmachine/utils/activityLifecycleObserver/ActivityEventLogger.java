@@ -18,6 +18,6 @@ public class ActivityEventLogger extends Subscriber<ActivityEvent> {
 
     @Override
     public void onNext(ActivityEvent activityEvent) {
-        Timber.e(activityEvent.toString());
+//        Timber.e(activityEvent.toString());
     }
 }

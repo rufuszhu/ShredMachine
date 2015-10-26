@@ -13,11 +13,14 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 
+import com.google.android.gms.location.DetectedActivity;
 import com.rufus.shredmachine.R;
 import com.rufus.shredmachine.ShredMachineApplication;
 import com.rufus.shredmachine.activity.TrackingActivity;
 import com.rufus.shredmachine.utils.Constants;
 import com.rufus.shredmachine.utils.TimeUtil;
+
+import java.util.ArrayList;
 
 import timber.log.Timber;
 
@@ -94,26 +97,28 @@ public class TrackingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.getAction().equals(Constants.ACTION.START_FOREGROUND_ACTION)) {
-            Timber.i("Received Start Foreground Intent ");
-            startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, pauseNotification);
-        } else if (intent.getAction().equals(Constants.ACTION.PAUSE_ACTION)) {
-            Timber.i("Clicked Pause");
-            mNotificationManager.notify(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, playNotification);
-            //TODO: stop the timer
-            mShredLocationManager.stopLocationUpdates();
-            mShredLocationManager.disconnectGoogleApiClient();
-        } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
-            mNotificationManager.notify(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, pauseNotification);
-            Timber.i("Clicked Play");
-            mShredLocationManager.connectGoogleApiClient();
-        } else if (intent.getAction().equals(Constants.ACTION.STOP_FOREGROUND_ACTION)) {
-            Timber.i("Received Stop Foreground Intent");
-            mShredLocationManager.trackResult.stopTime = TimeUtil.getTimeStamp();
-            mShredLocationManager.trackResult.update();
+        if(intent.getAction()!=null){
+            if (intent.getAction().equals(Constants.ACTION.START_FOREGROUND_ACTION)) {
+                Timber.i("Received Start Foreground Intent ");
+                startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, pauseNotification);
+            } else if (intent.getAction().equals(Constants.ACTION.PAUSE_ACTION)) {
+                Timber.i("Clicked Pause");
+                mNotificationManager.notify(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, playNotification);
+                //TODO: stop the timer
+                mShredLocationManager.stopLocationUpdates();
+                mShredLocationManager.disconnectGoogleApiClient();
+            } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
+                mNotificationManager.notify(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, pauseNotification);
+                Timber.i("Clicked Play");
+                mShredLocationManager.connectGoogleApiClient();
+            } else if (intent.getAction().equals(Constants.ACTION.STOP_FOREGROUND_ACTION)) {
+                Timber.i("Received Stop Foreground Intent");
+                mShredLocationManager.trackResult.stopTime = TimeUtil.getTimeStamp();
+                mShredLocationManager.trackResult.update();
 
-            stopForeground(true);
-            stopSelf();
+                stopForeground(true);
+                stopSelf();
+            }
         }
         return START_STICKY;
     }
