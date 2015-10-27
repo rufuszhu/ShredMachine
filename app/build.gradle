@@ -1,17 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'spoon'
-//apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
-
-//    compileOptions {
-//        sourceCompatibility JavaVersion.VERSION_1_8
-//        targetCompatibility JavaVersion.VERSION_1_8
-//    }
-
 
     defaultConfig {
         applicationId "com.rufus.shredmachine"
@@ -66,3 +59,33 @@ dependencies {
     androidTestCompile 'com.android.support.test:testing-support-lib:0.1'
     androidTestCompile 'com.squareup.spoon:spoon-client:1.1.9'
 }
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
+    }
+}
+//https://github.com/JakeWharton/hugo
+apply plugin: 'com.jakewharton.hugo'
+
+//buildscript {
+//    repositories {
+//        mavenCentral()
+//    }
+//
+//    dependencies {
+//        classpath 'me.tatarka:gradle-retrolambda:3.2.3'
+//    }
+//}
+//
+//// Required because retrolambda is on maven central
+//repositories {
+//    mavenCentral()
+//}
+//
+//apply plugin: 'me.tatarka.retrolambda'
+
