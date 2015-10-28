@@ -1,0 +1,45 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:id="@+id/play_pause"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true">
+
+        <View
+            android:id="@+id/morph"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:background="@drawable/switch_btn_start_vector"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
+
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="00:00"
+        android:textSize="24sp"
+        android:background="?android:attr/selectableItemBackground"/>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_stop_24dp"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
+
+</merge>

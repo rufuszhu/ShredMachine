@@ -14,8 +14,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
+import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.LinearLayout;
@@ -82,21 +84,21 @@ public class TrackingActivity extends AppCompatActivity
     FloatingActionButton fab;
 
 
-    @OnClick(R.id.start)
-    void startService(View view) {
-        Intent startIntent = new Intent(TrackingActivity.this, TrackingService.class);
-        startIntent.setAction(Constants.ACTION.START_FOREGROUND_ACTION);
-        startService(startIntent);
-    }
-
-    @OnClick(R.id.stop)
-    void stopService(View view) {
-        if (isTrackingServiceRunning()) {
-            Intent stopIntent = new Intent(TrackingActivity.this, TrackingService.class);
-            stopIntent.setAction(Constants.ACTION.STOP_FOREGROUND_ACTION);
-            startService(stopIntent);
-        }
-    }
+//    @OnClick(R.id.start)
+//    void startService(View view) {
+//        Intent startIntent = new Intent(TrackingActivity.this, TrackingService.class);
+//        startIntent.setAction(Constants.ACTION.START_FOREGROUND_ACTION);
+//        startService(startIntent);
+//    }
+//
+//    @OnClick(R.id.stop)
+//    void stopService(View view) {
+//        if (isTrackingServiceRunning()) {
+//            Intent stopIntent = new Intent(TrackingActivity.this, TrackingService.class);
+//            stopIntent.setAction(Constants.ACTION.STOP_FOREGROUND_ACTION);
+//            startService(stopIntent);
+//        }
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,15 +125,13 @@ public class TrackingActivity extends AppCompatActivity
 
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
     }
 
     @Override
     public void onDestroy() {
         Timber.i("onDestory");
         line.remove();
-        mMap=null;
+        mMap = null;
         super.onDestroy();
     }
 
@@ -147,7 +147,6 @@ public class TrackingActivity extends AppCompatActivity
         transition.addListener(new Transition.TransitionListener() {
             @Override
             public void onTransitionStart(Transition transition) {
-
             }
 
             @Override
@@ -155,7 +154,6 @@ public class TrackingActivity extends AppCompatActivity
                 // Removing listener here is very important because shared element transition is executed again backwards on exit. If we don't remove the listener this code will be triggered again.
                 transition.removeListener(this);
                 animateRevealShow(llControlBar);
-
             }
 
             @Override
@@ -173,37 +171,15 @@ public class TrackingActivity extends AppCompatActivity
     }
 
     private void setupExitAnimations() {
-        Fade returnTransition = new Fade();
-        getWindow().setReturnTransition(returnTransition);
-        returnTransition.setDuration(NORMAL_ANIMATION_LENGTH);
-        returnTransition.setStartDelay(NORMAL_ANIMATION_LENGTH);
-        returnTransition.addListener(new Transition.TransitionListener() {
-            @Override
-            public void onTransitionStart(Transition transition) {
-                transition.removeListener(this);
-                animateRevealHide(llControlBar);
-            }
+//        Slide returnTransition = new Slide();
+//        returnTransition.setSlideEdge(Gravity.BOTTOM);
+//        getWindow().setReturnTransition(returnTransition);
+//        returnTransition.setDuration(NORMAL_ANIMATION_LENGTH);
 
-            @Override
-            public void onTransitionEnd(Transition transition) {
-            }
-
-            @Override
-            public void onTransitionCancel(Transition transition) {
-            }
-
-            @Override
-            public void onTransitionPause(Transition transition) {
-            }
-
-            @Override
-            public void onTransitionResume(Transition transition) {
-            }
-        });
     }
 
     private void animateRevealShow(View view) {
-        int cx = (fab.getLeft() + fab.getRight()) / 2;
+        int cx = view.getWidth() / 2;
         int cy = view.getHeight() / 2;
 
         int finalRadius = Math.max(view.getWidth(), view.getHeight());
@@ -213,10 +189,16 @@ public class TrackingActivity extends AppCompatActivity
         anim.setDuration(NORMAL_ANIMATION_LENGTH);
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                Timber.d("hiding");
-                fab.setVisibility(View.INVISIBLE);
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                Timber.i("onAnimationStart");
+                fab.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        fab.setVisibility(View.INVISIBLE);
+                    }
+                });
+
             }
         });
         anim.start();
@@ -232,7 +214,7 @@ public class TrackingActivity extends AppCompatActivity
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                fab.setVisibility(View.VISIBLE);
+//                fab.setVisibility(View.VISIBLE);
                 view.setVisibility(View.INVISIBLE);
             }
         });

@@ -12,31 +12,16 @@
         android:name="com.google.android.gms.maps.MapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_above="@+id/ll_control_bar"/>
+        android:layout_weight="1"/>
 
-    <LinearLayout
+    <com.rufus.shredmachine.view.tracking.ControlBarView
         android:id="@+id/ll_control_bar"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="68dp"
         android:orientation="horizontal"
         android:background="@color/color_accent"
+        android:elevation="2dpc"
         android:visibility="invisible"
-        tools:visibility="visible">
-
-        <Button
-            android:id="@+id/start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start" />
-
-        <Button
-            android:id="@+id/stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/start"
-            android:text="Stop" />
-
-    </LinearLayout>
+        tools:visibility="visible"/>
 
 </LinearLayout>
