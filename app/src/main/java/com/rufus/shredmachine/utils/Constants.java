@@ -32,7 +32,10 @@ public class Constants {
 
     public interface SHARE_PREFERENCE {
         String ACTIVE_TRACK_ID = "ACTIVE_TRACK_ID";
+        String GEOFENCE = "GEOFENCE";
     }
+
+
 
     /**
      * Returns a human readable String corresponding to a detected activity type.

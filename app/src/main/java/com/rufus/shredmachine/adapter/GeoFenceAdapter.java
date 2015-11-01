@@ -9,13 +9,12 @@ import com.rufus.shredmachine.R;
 import com.rufus.shredmachine.model.GeofenceData;
 import com.rufus.shredmachine.view.geofence.GeoFenceItemView;
 
-import java.util.Collections;
 import java.util.List;
 
 public class GeoFenceAdapter extends RecyclerView.Adapter<GeoFenceAdapter.ViewHolder> {
 
     public interface GeoFenceClickListener {
-        void onRepositoryClick(GeofenceData geofenceData);
+        void onGeoFenceClick(GeofenceData geofenceData);
     }
 
     private final GeoFenceClickListener geoFenceClickListener;
@@ -50,6 +49,12 @@ public class GeoFenceAdapter extends RecyclerView.Adapter<GeoFenceAdapter.ViewHo
         return geofenceDatas.size();
     }
 
+    public void updateItem(List<GeofenceData> newDatas){
+        geofenceDatas.clear();
+        geofenceDatas.addAll(newDatas);
+        notifyDataSetChanged();
+    }
+
     public final class ViewHolder extends RecyclerView.ViewHolder {
         public final GeoFenceItemView itemView;
 
@@ -60,7 +65,7 @@ public class GeoFenceAdapter extends RecyclerView.Adapter<GeoFenceAdapter.ViewHo
                 @Override
                 public void onClick(View v) {
                     GeofenceData geofence = geofenceDatas.get(getAdapterPosition());
-                    geoFenceClickListener.onRepositoryClick(geofence);
+                    geoFenceClickListener.onGeoFenceClick(geofence);
                 }
             });
         }

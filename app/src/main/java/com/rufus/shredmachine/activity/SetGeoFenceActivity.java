@@ -2,6 +2,7 @@ package com.rufus.shredmachine.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
@@ -32,11 +33,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.rufus.shredmachine.R;
 import com.rufus.shredmachine.adapter.PlaceAutocompleteAdapter;
 import com.rufus.shredmachine.model.GeofenceData;
+import com.rufus.shredmachine.utils.Constants;
 import com.rufus.shredmachine.utils.KeyBoard;
 import com.rufus.shredmachine.view.geofence.TouchableMapFragment;
 import com.rufus.shredmachine.view.geofence.TouchableWrapper;
@@ -58,6 +61,7 @@ public class SetGeoFenceActivity extends AppCompatActivity implements OnMapReady
     private PlaceAutocompleteAdapter mAdapter;
     private Location currentLocation;
 
+    private GeofenceData data;
     private double currentRadius;
 
     @Bind(R.id.toolbar)
@@ -82,22 +86,8 @@ public class SetGeoFenceActivity extends AppCompatActivity implements OnMapReady
     TextView tvRadius;
 
     @OnClick(R.id.current_location_btn)
-    void moveToCurrentLocation() {
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        } else {
-            Toast.makeText(this, R.string.err_no_location, Toast.LENGTH_LONG).show();
-            if (mGoogleApiClient == null)
-                buildGoogleApiClient();
-            else
-                mGoogleApiClient.connect();
-        }
-
-        if (mMap != null && currentLocation != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), ZOOM_LEVEL));
-        } else {
-            Toast.makeText(this, R.string.err_no_location, Toast.LENGTH_LONG).show();
-        }
+    void onCurrentClick() {
+        moveToCurrentLocation(true);
     }
 
 
@@ -134,6 +124,8 @@ public class SetGeoFenceActivity extends AppCompatActivity implements OnMapReady
 //                });
 
         snackbar.show();
+
+        data = getIntent().getParcelableExtra(Constants.SHARE_PREFERENCE.GEOFENCE);
     }
 
     @Override
@@ -172,7 +164,11 @@ public class SetGeoFenceActivity extends AppCompatActivity implements OnMapReady
 
             final EditText etNickName = (EditText) inflater.inflate(R.layout.dialog_geo_nickname, null);
 
-
+            if (data != null) {
+                etNickName.setText(data.nickName);
+                etNickName.setSelection(data.nickName.length() - 1);
+                etNickName.selectAll();
+            }
             // Inflate and set the layout for the dialog
             // Pass null as the parent view because its going in the dialog layout
             builder.setView(etNickName)
@@ -183,18 +179,35 @@ public class SetGeoFenceActivity extends AppCompatActivity implements OnMapReady
                             if (etNickName.getText().toString().isEmpty()) {
                                 etNickName.setError("should not be empty");
                             } else {
-                                GeofenceData data = new GeofenceData();
-                                data.latLng = mMap.getCameraPosition().target;
-                                data.radius = currentRadius;
-                                data.nickName = etNickName.getText().toString();
-                                data.save();
+                                if (data == null) {
+                                    GeofenceData newData = new GeofenceData();
+                                    newData.latLng = mMap.getCameraPosition().target;
+                                    newData.radius = currentRadius;
+                                    newData.nickName = etNickName.getText().toString();
+                                    newData.zoomLevel = mMap.getCameraPosition().zoom;
+                                    newData.save();
+                                } else {
+                                    data.latLng = mMap.getCameraPosition().target;
+                                    data.radius = currentRadius;
+                                    data.nickName = etNickName.getText().toString();
+                                    data.zoomLevel = mMap.getCameraPosition().zoom;
+                                    data.save();
+                                }
+                                KeyBoard.closeKeyBoard(etNickName);
                                 finish();
                             }
+                        }
+                    })
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            KeyBoard.closeKeyBoard(etNickName);
                         }
                     });
 
             builder.create().show();
 
+            etNickName.post(() -> KeyBoard.openKeyBoard(etNickName));
 
             return true;
         }
@@ -215,6 +228,9 @@ public class SetGeoFenceActivity extends AppCompatActivity implements OnMapReady
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
+        if (data != null)
+            mMap.addCircle(new CircleOptions().center(data.latLng).radius(data.radius).strokeColor(R.color.color_accent).fillColor(Color.BLUE).strokeWidth(20));
+
         buildGoogleApiClient();
     }
 
@@ -245,10 +261,35 @@ public class SetGeoFenceActivity extends AppCompatActivity implements OnMapReady
         atvSearchAddress.setOnItemClickListener(mAutocompleteClickListener);
     }
 
+    private void moveToCurrentLocation(boolean animate) {
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        } else {
+            Toast.makeText(this, R.string.err_no_location, Toast.LENGTH_LONG).show();
+            if (mGoogleApiClient == null)
+                buildGoogleApiClient();
+            else
+                mGoogleApiClient.connect();
+        }
+
+        if (mMap != null && currentLocation != null) {
+            if (animate)
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), ZOOM_LEVEL));
+            else
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), ZOOM_LEVEL));
+        } else {
+            Toast.makeText(this, R.string.err_no_location, Toast.LENGTH_LONG).show();
+        }
+    }
 
     @Override
     public void onConnected(Bundle bundle) {
-        moveToCurrentLocation();
+        if (data != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(data.latLng, data.zoomLevel));
+        } else {
+            moveToCurrentLocation(false);
+        }
+
         buildCurrentLocationBound();
         buildAutoComplete();
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {

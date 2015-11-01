@@ -72,20 +72,20 @@ buildscript {
 //https://github.com/JakeWharton/hugo
 apply plugin: 'com.jakewharton.hugo'
 
-//buildscript {
-//    repositories {
-//        mavenCentral()
-//    }
-//
-//    dependencies {
-//        classpath 'me.tatarka:gradle-retrolambda:3.2.3'
-//    }
-//}
-//
-//// Required because retrolambda is on maven central
-//repositories {
-//    mavenCentral()
-//}
-//
-//apply plugin: 'me.tatarka.retrolambda'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.2.3'
+    }
+}
+
+// Required because retrolambda is on maven central
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'me.tatarka.retrolambda'
 
