@@ -15,4 +15,7 @@
 
     <dimen name="progress_bar_min_height">6dp</dimen>
     <dimen name="progress_bar_top_margin">4dp</dimen>
+
+    <dimen name="geofence_circle_stroke_width">50dp</dimen>
+    <dimen name="geofence_circle_stroke_margin">-50dp</dimen>
 </resources>
